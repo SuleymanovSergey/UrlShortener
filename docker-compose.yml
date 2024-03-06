@@ -1,16 +1,16 @@
 version: '3'
 
 services:
-
   mysql-local:
     image: mysql:8.0
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=shortener
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=root
+      - MYSQL_ROOT_PASSWORD=root   # Пароль для пользователя root
+      - MYSQL_DATABASE=shortener   # Создание базы данных при старте
     ports:
       - 3306:3306
+    command: --default-authentication-plugin=mysql_native_password  # Если ваше приложение не поддерживает новую аутентификацию MySQL 8, добавьте эту команду
+    volumes:
+      - mysql-data:/var/lib/mysql   # Сохранение данных MySQL в том
 
   myapp-main:
     build:
@@ -22,4 +22,12 @@ services:
       - mysql-local
     ports:
       - 8080:8080
-      
+    environment:
+      - DATABASE_HOST=mysql-local   # Имя хоста должно совпадать с именем сервиса в docker-compose
+      - DATABASE_USER=root         # Если ваше приложение должно подключаться как root
+      - DATABASE_PASSWORD=root     # Пароль для подключения к базе данных
+      - DATABASE_NAME=shortener    # Имя базы данных, если оно нужно в приложении
+
+volumes:
+  mysql-data:
+    driver: local
