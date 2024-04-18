@@ -1,8 +1,7 @@
 package com.tsypk.urlshortener.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import java.util.Date;
 
@@ -11,6 +10,8 @@ import java.util.Date;
 @Table(name = "ShortUrls")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 public class ShortUrl {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "short_url_sequence")
