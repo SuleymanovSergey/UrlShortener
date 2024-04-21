@@ -13,20 +13,17 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 public class ShortUrl {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "short_url_sequence")
-    @SequenceGenerator(name = "short_url_sequence", sequenceName = "short_url_sequence", allocationSize = 1)
-    private Long id;
-
-    @Column(name = "original_url", nullable = false, length = 2048)
-    private String originalUrl;
-
-    @Column(name = "short_url_code", unique = true, nullable = false, length = 10)
+    @Column(name = "short_url_code", unique = true, length = 10)
     private String shortUrlCode;
+
+    @Column(name = "original_url", length = 2048)
+    private String originalUrl;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", updatable = false)
     private Date createdAt;
 
     @Temporal(TemporalType.TIMESTAMP)
