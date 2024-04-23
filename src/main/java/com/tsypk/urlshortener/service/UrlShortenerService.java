@@ -21,24 +21,19 @@ public class UrlShortenerService {
         ShortUrl shortUrl = new ShortUrl();
         shortUrl.setOriginalUrl(originalUrl);
 
-        // Получение следующего короткого кода из базы данных
-        String shortCode = getNextShortCode();
+        String shortCode = getNextShortCode(); // Получение следующего короткого кода из базы данных
         shortUrl.setShortUrlCode(shortCode);
 
         return shortUrlRepository.save(shortUrl);
     }
 
     private String getNextShortCode() {
-        // Получаем следующий доступный короткий код из базы данных
-        ShortCode shortCode = shortCodeRepository.findFirstByOrderByCodeAsc();
+        ShortCode shortCode = shortCodeRepository.findFirstByOrderByCodeAsc(); // Получаем следующий доступный короткий код из базы данных
 
         if (shortCode != null) {
-            // Удаляем использованный короткий код из базы данных
-            shortCodeRepository.delete(shortCode);
+            shortCodeRepository.delete(shortCode); // Удаляем использованный короткий код из базы данных
             return shortCode.getCode();
         } else {
-            // Если короткий код не найден, вы можете выбрать, что делать дальше.
-            // Например, выбросить исключение или вернуть значение по умолчанию.
             throw new IllegalStateException("No available short code found.");
         }
     }

@@ -15,5 +15,6 @@ public class ShortCode {
     private Long id;
 
     private String code;
+    public ShortCode (){}
 }
 

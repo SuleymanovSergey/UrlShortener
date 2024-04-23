@@ -25,18 +25,15 @@ public class ShortUrlController {
 
     @PostMapping("/shorten")
     public ResponseEntity<ShortUrlDTO> shortenUrl(@RequestBody CreateShortUrlDTO createShortUrlDTO) {
-        // Создание короткого URL с помощью сервиса UrlShortenerService
-        ShortUrl shortUrl = urlShortenerService.createShortUrl(createShortUrlDTO.getOriginalUrl());
+        ShortUrl shortUrl = urlShortenerService.createShortUrl(createShortUrlDTO.getOriginalUrl());// Создание короткого URL с помощью сервиса UrlShortenerService
 
-        // Формирование DTO для возвращаемого значения
-        ShortUrlDTO shortUrlDTO = new ShortUrlDTO();
+        ShortUrlDTO shortUrlDTO = new ShortUrlDTO(); // Формирование DTO для возвращаемого значения
         shortUrlDTO.setOriginalUrl(shortUrl.getOriginalUrl());
         shortUrlDTO.setShortUrlCode(shortUrl.getShortUrlCode());
         shortUrlDTO.setCreatedAt(shortUrl.getCreatedAt());
         shortUrlDTO.setDestroyedAt(shortUrl.getDestroyedAt());
 
-        // Возврат сокращенной ссылки и статуса 201 Created
-        return ResponseEntity.status(HttpStatus.CREATED).body(shortUrlDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(shortUrlDTO);  // Возврат сокращенной ссылки и статуса 201 Created
     }
 
     @Autowired
@@ -44,17 +41,13 @@ public class ShortUrlController {
 
     @GetMapping("/redirect/{shortCode}")
     public RedirectView redirect(@PathVariable String shortCode) {
-        // Получаем ShortUrl по короткому коду из репозитория
-        ShortUrl shortUrl = shortUrlRepository.findByShortUrlCode(shortCode);
+        ShortUrl shortUrl = shortUrlRepository.findByShortUrlCode(shortCode); // Получаем ShortUrl по короткому коду из репозитория
 
-        // Проверяем, был ли найден ShortUrl
-        if (shortUrl == null) {
-            // Если ShortUrl не найден, выполняем перенаправление на страницу с ошибкой или другую альтернативную страницу
-            return new RedirectView("/error");
+        if (shortUrl == null) {// Проверяем, был ли найден ShortUrl
+            return new RedirectView("/error");// Если ShortUrl не найден, выполняем перенаправление на страницу с ошибкой или другую альтернативную страницу
         }
 
-        // Получаем оригинальный URL из ShortUrl и выполняем перенаправление
-        String originalUrl = shortUrl.getOriginalUrl();
+        String originalUrl = shortUrl.getOriginalUrl();  // Получаем оригинальный URL из ShortUrl и выполняем перенаправление
         return new RedirectView(originalUrl);
     }
 }

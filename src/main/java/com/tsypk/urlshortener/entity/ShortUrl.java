@@ -15,7 +15,7 @@ import java.util.Date;
 public class ShortUrl {
 
     @Id
-    @Column(name = "short_url_code", unique = true, length = 10)
+    @Column(name = "short_url_code", unique = true, length = 15)
     private String shortUrlCode;
 
     @Column(name = "original_url", length = 2048)
@@ -30,11 +30,11 @@ public class ShortUrl {
     @Column(name = "destroyed_at")
     private Date destroyedAt;
 
-    // Конструктор для создания объекта с установкой времени уничтожения через неделю
-    public ShortUrl() {
-        // Установка даты уничтожения через неделю после создания
+
+    public ShortUrl() {// Конструктор для создания объекта с установкой времени уничтожения через неделю
         Date now = new Date();
-        long oneWeekInMillis = 7 * 24 * 60 * 60 * 1000; // 1 неделя в миллисекундах
+        long oneWeekInMillis = 7 * 24 * 60 * 60 * 1000; // Установка даты уничтожения через неделю после создания
+        this.createdAt = new Date(now.getTime());
         this.destroyedAt = new Date(now.getTime() + oneWeekInMillis);
     }
 }
