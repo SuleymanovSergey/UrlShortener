@@ -1,6 +1,5 @@
 package com.tsypk.urlshortener.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tsypk.urlshortener.DTO.CreateShortUrlDTO;
 import com.tsypk.urlshortener.DTO.ShortUrlDTO;
 import com.tsypk.urlshortener.entity.ShortUrl;
@@ -9,11 +8,13 @@ import com.tsypk.urlshortener.service.UrlShortenerService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Tag(name = "main_methods")
@@ -37,6 +38,24 @@ public class ShortUrlController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(shortUrlDTO);  // Возврат сокращенной ссылки и статуса 201 Created
     }
+
+    @PostMapping("/shortenWithDate")
+    public ResponseEntity shortenUrlWithDate(@RequestBody CreateShortUrlDTO createShortUrlDTO, @RequestParam("destroyedAt") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'") Date destroyedAt) {
+        ShortUrl shortUrl = urlShortenerService.createShortUrl(createShortUrlDTO.getOriginalUrl());
+
+        // Присваиваем значение даты из параметра destroyedAt
+        shortUrl.setDestroyedAt(destroyedAt);
+
+        ShortUrlDTO shortUrlDTO = new ShortUrlDTO(); // Формирование DTO для возвращаемого значения
+        shortUrlDTO.setOriginalUrl(shortUrl.getOriginalUrl());
+        shortUrlDTO.setShortUrlCode(shortUrl.getShortUrlCode());
+        shortUrlDTO.setCreatedAt(shortUrl.getCreatedAt());
+        shortUrlDTO.setDestroyedAt(shortUrl.getDestroyedAt());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(shortUrlDTO);  // Возврат сокращенной ссылки и статуса 201 Created
+    }
+
+
 
     @Autowired
     private ShortUrlRepository shortUrlRepository;
