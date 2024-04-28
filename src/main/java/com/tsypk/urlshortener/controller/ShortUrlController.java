@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.util.Date;
+
 @Tag(name = "main_methods")
 @Slf4j
 @RestController
@@ -41,13 +43,22 @@ public class ShortUrlController {
 
     @GetMapping("/redirect/{shortCode}")
     public RedirectView redirect(@PathVariable String shortCode) {
-        ShortUrl shortUrl = shortUrlRepository.findByShortUrlCode(shortCode); // Получаем ShortUrl по короткому коду из репозитория
+        ShortUrl shortUrl = shortUrlRepository.findByShortUrlCode(shortCode);
 
-        if (shortUrl == null) {// Проверяем, был ли найден ShortUrl
-            return new RedirectView("/error");// Если ShortUrl не найден, выполняем перенаправление на страницу с ошибкой или другую альтернативную страницу
+        if (shortUrl == null) {
+            return new RedirectView("/error");
         }
 
-        String originalUrl = shortUrl.getOriginalUrl();  // Получаем оригинальный URL из ShortUrl и выполняем перенаправление
+        Date now = new Date();
+        Date destroyedAt = shortUrl.getDestroyedAt();
+
+        if (destroyedAt != null && now.after(destroyedAt)) {
+            // Если TTL истек, выполняем перенаправление на страницу с сообщением о истекшей ссылке
+            return new RedirectView("/expired");
+        }
+
+        String originalUrl = shortUrl.getOriginalUrl();
         return new RedirectView(originalUrl);
     }
 }
+
