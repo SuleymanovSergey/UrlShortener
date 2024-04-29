@@ -42,6 +42,13 @@ dependencies {
     testImplementation("org.testcontainers:postgresql")
 }
 
+tasks {
+    jar {
+        enabled = true
+    }
+}
+
+
 tasks.withType<Test> {
     useJUnitPlatform()
 }

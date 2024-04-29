@@ -13,8 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
-
-import java.time.LocalDate;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+import com.tsypk.urlshortener.service.UrlCacheService;
 import java.util.Date;
 
 @Tag(name = "main_methods")
@@ -55,28 +57,35 @@ public class ShortUrlController {
         return ResponseEntity.status(HttpStatus.CREATED).body(shortUrlDTO);  // Возврат сокращенной ссылки и статуса 201 Created
     }
 
-
-
     @Autowired
     private ShortUrlRepository shortUrlRepository;
 
+    @Autowired
+    private UrlCacheService urlCacheService;
+
     @GetMapping("/redirect/{shortCode}")
     public RedirectView redirect(@PathVariable String shortCode) {
-        ShortUrl shortUrl = shortUrlRepository.findByShortUrlCode(shortCode);
+        String originalUrl = urlCacheService.getOriginalUrl(shortCode);
 
-        if (shortUrl == null) {
-            return new RedirectView("/error");
+        if (originalUrl == null) {
+            ShortUrl shortUrl = shortUrlRepository.findByShortUrlCode(shortCode);
+
+            if (shortUrl == null) {
+                return new RedirectView("/error");
+            }
+
+            Date now = new Date();
+            Date destroyedAt = shortUrl.getDestroyedAt();
+
+            if (destroyedAt != null && now.after(destroyedAt)) {
+                // Если TTL истек, выполняем перенаправление на страницу с сообщением о истекшей ссылке
+                return new RedirectView("/expired");
+            }
+
+            originalUrl = shortUrl.getOriginalUrl();
+            urlCacheService.cacheUrl(shortCode, originalUrl);
         }
 
-        Date now = new Date();
-        Date destroyedAt = shortUrl.getDestroyedAt();
-
-        if (destroyedAt != null && now.after(destroyedAt)) {
-            // Если TTL истек, выполняем перенаправление на страницу с сообщением о истекшей ссылке
-            return new RedirectView("/expired");
-        }
-
-        String originalUrl = shortUrl.getOriginalUrl();
         return new RedirectView(originalUrl);
     }
 }
