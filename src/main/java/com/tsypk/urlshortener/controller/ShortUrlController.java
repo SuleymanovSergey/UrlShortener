@@ -4,6 +4,7 @@ import com.tsypk.urlshortener.DTO.CreateShortUrlDTO;
 import com.tsypk.urlshortener.DTO.ShortUrlDTO;
 import com.tsypk.urlshortener.entity.ShortUrl;
 import com.tsypk.urlshortener.repository.ShortUrlRepository;
+import com.tsypk.urlshortener.service.KafkaProducerService;
 import com.tsypk.urlshortener.service.UrlShortenerService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -28,17 +29,27 @@ public class ShortUrlController {
     @Autowired
     private UrlShortenerService urlShortenerService;
 
+    @Autowired
+    private KafkaProducerService kafkaProducerService;
+
     @PostMapping("/shorten")
     public ResponseEntity<ShortUrlDTO> shortenUrl(@RequestBody CreateShortUrlDTO createShortUrlDTO) {
-        ShortUrl shortUrl = urlShortenerService.createShortUrl(createShortUrlDTO.getOriginalUrl());// Создание короткого URL с помощью сервиса UrlShortenerService
+//        ShortUrl shortUrl = urlShortenerService.createShortUrl(createShortUrlDTO.getOriginalUrl());// Создание короткого URL с помощью сервиса UrlShortenerService
 
+        // Отправка оригинального URL в Kafka
+        kafkaProducerService.sendMessage("long-url-topic", createShortUrlDTO.getOriginalUrl());
         ShortUrlDTO shortUrlDTO = new ShortUrlDTO(); // Формирование DTO для возвращаемого значения
-        shortUrlDTO.setOriginalUrl(shortUrl.getOriginalUrl());
-        shortUrlDTO.setShortUrlCode(shortUrl.getShortUrlCode());
-        shortUrlDTO.setCreatedAt(shortUrl.getCreatedAt());
-        shortUrlDTO.setDestroyedAt(shortUrl.getDestroyedAt());
+        shortUrlDTO.setOriginalUrl(createShortUrlDTO.getOriginalUrl());
+        shortUrlDTO.setShortUrlCode("processing"); // Или другой индикатор
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(shortUrlDTO);  // Возврат сокращенной ссылки и статуса 201 Created
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(shortUrlDTO);
+
+//        ShortUrlDTO shortUrlDTO = new ShortUrlDTO(); // Формирование DTO для возвращаемого значения
+//        shortUrlDTO.setOriginalUrl(shortUrl.getOriginalUrl());
+//        shortUrlDTO.setShortUrlCode(shortUrl.getShortUrlCode());
+//        shortUrlDTO.setCreatedAt(shortUrl.getCreatedAt());
+//        shortUrlDTO.setDestroyedAt(shortUrl.getDestroyedAt());
+//        return ResponseEntity.status(HttpStatus.CREATED).body(shortUrlDTO);  // Возврат сокращенной ссылки и статуса 201 Created
     }
 
     @PostMapping("/shortenWithDate")

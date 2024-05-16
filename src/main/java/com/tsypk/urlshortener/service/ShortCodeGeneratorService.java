@@ -2,7 +2,6 @@ package com.tsypk.urlshortener.service;
 
 import com.tsypk.urlshortener.entity.ShortCode;
 import com.tsypk.urlshortener.repository.ShortCodeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -10,8 +9,11 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class ShortCodeGeneratorService {
 
-    @Autowired
-    private ShortCodeRepository shortCodeRepository;
+    private final ShortCodeRepository shortCodeRepository;
+
+    public ShortCodeGeneratorService(ShortCodeRepository shortCodeRepository) {
+        this.shortCodeRepository = shortCodeRepository;
+    }
 
     public void generateShortCodes(Long count) {
         for (int i = 0; i < count; i++) {

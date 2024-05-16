@@ -2,7 +2,6 @@ package com.tsypk.urlshortener.service;
 
 import com.tsypk.urlshortener.entity.ShortUrl;
 import com.tsypk.urlshortener.repository.ShortUrlRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +11,11 @@ import java.util.List;
 @Service
 public class UrlCleanupService {
 
-    @Autowired
-    private ShortUrlRepository shortUrlRepository;
+    private final ShortUrlRepository shortUrlRepository;
+
+    public UrlCleanupService(ShortUrlRepository shortUrlRepository) {
+        this.shortUrlRepository = shortUrlRepository;
+    }
 
     @Scheduled(fixedDelay = 3600000) // Проверка каждый час
     public void cleanupExpiredUrls() {

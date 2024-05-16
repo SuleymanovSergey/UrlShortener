@@ -4,21 +4,20 @@ import com.tsypk.urlshortener.entity.ShortCode;
 import com.tsypk.urlshortener.entity.ShortUrl;
 import com.tsypk.urlshortener.repository.ShortCodeRepository;
 import com.tsypk.urlshortener.repository.ShortUrlRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.view.RedirectView;
 
-import java.util.Date;
-import java.util.UUID;
+import java.util.List;
 
 @Service
 public class UrlShortenerService {
 
-    @Autowired
-    private ShortUrlRepository shortUrlRepository;
+    private final ShortUrlRepository shortUrlRepository;
+    private final ShortCodeRepository shortCodeRepository;
 
-    @Autowired
-    private ShortCodeRepository shortCodeRepository;
+    public UrlShortenerService(ShortUrlRepository shortUrlRepository, ShortCodeRepository shortCodeRepository) {
+        this.shortUrlRepository = shortUrlRepository;
+        this.shortCodeRepository = shortCodeRepository;
+    }
 
     public ShortUrl createShortUrl(String originalUrl) {
         ShortUrl shortUrl = new ShortUrl();
@@ -39,6 +38,10 @@ public class UrlShortenerService {
         } else {
             throw new IllegalStateException("No available short code found.");
         }
+    }
+
+    public void saveAll(List<ShortUrl> shortUrls) {
+        shortUrlRepository.saveAll(shortUrls); // Сохраняем все ShortUrl объекты в базе данных
     }
 }
 
